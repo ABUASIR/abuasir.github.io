@@ -48,8 +48,10 @@
       cursor:pointer;
       font-weight:700;
       margin:6px;
+      transition:.2s;
     }
     button:hover{border-color:#3a4454}
+    button.active{border-color:#22d3ee;color:#22d3ee;}
     .inputish{
       display:inline-flex;
       align-items:center;
@@ -70,21 +72,19 @@
       font-size:1rem;
     }
     .muted{color:var(--muted);font-size:.95rem;margin-top:12px}
-    #hidden-content{display:none}
   </style>
 </head>
 <body>
 
   <div class="panel">
-    <button id="toggleBtn">إيقاف</button>
+    <button id="toggleBtn">تشغيل</button>
     <div class="inputish">
       كل <input id="intervalSec" type="number" min="1" value="5"> ثوان
     </div>
-
     <div class="muted">برمجة العسيري لتخطي السرعة</div>
   </div>
 
-  <!-- 🔹 كود الإعلان يوضع هنا تحت اللوحة -->
+  <!-- 🔹 كود الإعلان -->
   <ins class="adsbygoogle"
        style="display:block;margin:10px auto;width:90%;max-width:728px;"
        data-ad-client="ca-pub-6596385917043322"
@@ -137,14 +137,16 @@
       const sec = Math.max(1, Number(intervalSec.value) || 5);
       if(running) stop();
       running = true;
-      toggleBtn.textContent = "تشغيل";
+      toggleBtn.textContent = "إيقاف"; // ✅ تم التصحيح
+      toggleBtn.classList.add("active");
       checkAll();
       handle = setInterval(checkAll, sec * 1000);
     }
 
     function stop(){
       running = false;
-      toggleBtn.textContent = "إيقاف";
+      toggleBtn.textContent = "تشغيل"; // ✅ تم التصحيح
+      toggleBtn.classList.remove("active");
       if(handle){ clearInterval(handle); handle = null; }
     }
 
