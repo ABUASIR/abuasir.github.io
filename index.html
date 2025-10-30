@@ -1,28 +1,154 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>التحقق من Google AdSense</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>تخطي تحديد السرعة العسيري</title>
 
-  <!-- كود AdSense -->
+  <!-- ✅ كود تحميل سكربت AdSense -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6596385917043322"
      crossorigin="anonymous"></script>
-</head>
-<body style="text-align:center;font-family:'Tajawal',sans-serif;margin-top:100px;background:#0e0f12;color:#e9edf3;">
-  <h2>🔍 جاري مراجعة موقع abuasir.github.io من Google AdSense...</h2>
 
-  <!-- كود الإعلان -->
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#0e0f12; --card:#15171b; --text:#e9edf3; --muted:#9aa3b2;
+      --line:#2a2f39;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:#0e0f12;
+      color:var(--text);
+      font-family:"Tajawal",sans-serif;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      flex-direction:column;
+      height:100vh;
+      text-align:center;
+    }
+    .panel{
+      background:#15171b;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:20px;
+      box-shadow:0 0 15px rgba(0,0,0,.5);
+      text-align:center;
+      width:360px;
+      margin-bottom:25px;
+    }
+    button{
+      background:#0f131a;
+      border:1px solid var(--line);
+      color:var(--text);
+      padding:10px 16px;
+      border-radius:10px;
+      cursor:pointer;
+      font-weight:700;
+      margin:6px;
+    }
+    button:hover{border-color:#3a4454}
+    .inputish{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      background:#0f131a;
+      border:1px solid var(--line);
+      border-radius:10px;
+      padding:10px 14px;
+      margin:6px;
+    }
+    input{
+      background:transparent;
+      border:none;
+      outline:none;
+      color:var(--text);
+      width:54px;
+      text-align:center;
+      font-size:1rem;
+    }
+    .muted{color:var(--muted);font-size:.95rem;margin-top:12px}
+    #hidden-content{display:none}
+  </style>
+</head>
+<body>
+
+  <div class="panel">
+    <button id="toggleBtn">بدء الفحص</button>
+    <div class="inputish">
+      كل <input id="intervalSec" type="number" min="1" value="5"> ثوانٍ
+    </div>
+
+    <div class="muted">برمجة العسيري لتخطي السرعة</div>
+  </div>
+
+  <!-- 🔹 كود الإعلان يوضع هنا تحت اللوحة -->
   <ins class="adsbygoogle"
-       style="display:block;margin:40px auto;width:90%;max-width:728px;"
+       style="display:block;margin:10px auto;width:90%;max-width:728px;"
        data-ad-client="ca-pub-6596385917043322"
        data-ad-slot="3799740284"
        data-ad-format="auto"
        data-full-width-responsive="true"></ins>
-  <script>
-       (adsbygoogle = window.adsbygoogle || []).push({});
-  </script>
+  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
 
-  <p style="color:#9aa3b2;margin-top:60px;">© برمجة العسيري</p>
+  <script>
+    const urls = [
+      "https://speedtest.saudi.net.sa:8080/speedtest/upload.php",
+      "https://khamismushait-speedtest.saudi.net.sa:8080/speedtest/upload.php",
+      "https://dam-speedtest.saudi.net.sa:8080/speedtest/upload.php",
+      "https://jed-speedtest.saudi.net.sa:8080/speedtest/upload.php",
+      "https://bahrah-speedtest.saudi.net.sa:8080/speedtest/upload.php",
+      "https://makkah-speedtest.saudi.net.sa:8080/speedtest/upload.php",
+      "https://taif-speedtest.saudi.net.sa:8080/speedtest/upload.php",
+      "https://abha-speedtest.saudi.net.sa:8080/speedtest/upload.php",
+      "https://baha-speedtest.saudi.net.sa:8080/speedtest/upload.php"
+    ];
+
+    const TIMEOUT_MS = 10000;
+    const toggleBtn = document.getElementById("toggleBtn");
+    const intervalSec = document.getElementById("intervalSec");
+
+    let running = false, handle = null;
+
+    async function ping(url){
+      const controller = new AbortController();
+      const t0 = performance.now();
+      const timer = setTimeout(()=>controller.abort(), TIMEOUT_MS);
+      try{
+        await fetch(url, { method: "GET", mode: "no-cors", cache: "no-store", signal: controller.signal });
+        return { ok: true, ms: Math.round(performance.now() - t0) };
+      } catch {
+        return { ok: false, ms: Math.round(performance.now() - t0) };
+      } finally {
+        clearTimeout(timer);
+      }
+    }
+
+    async function checkAll(){
+      for(const u of urls){
+        const { ok, ms } = await ping(u);
+        console.log(`${ok ? "✅" : "❌"} ${u} (${ms} ms)`);
+      }
+    }
+
+    function start(){
+      const sec = Math.max(1, Number(intervalSec.value) || 5);
+      if(running) stop();
+      running = true;
+      toggleBtn.textContent = "إيقاف الفحص";
+      checkAll();
+      handle = setInterval(checkAll, sec * 1000);
+    }
+
+    function stop(){
+      running = false;
+      toggleBtn.textContent = "بدء الفحص";
+      if(handle){ clearInterval(handle); handle = null; }
+    }
+
+    toggleBtn.addEventListener("click", ()=> running ? stop() : start());
+  </script>
 </body>
 </html>
