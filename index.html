@@ -137,14 +137,14 @@
       const sec = Math.max(1, Number(intervalSec.value) || 5);
       if(running) stop();
       running = true;
-      toggleBtn.textContent = "إيقاف الفحص";
+      toggleBtn.textContent = "تشغيل";
       checkAll();
       handle = setInterval(checkAll, sec * 1000);
     }
 
     function stop(){
       running = false;
-      toggleBtn.textContent = "بدء الفحص";
+      toggleBtn.textContent = "إيقاف";
       if(handle){ clearInterval(handle); handle = null; }
     }
 
