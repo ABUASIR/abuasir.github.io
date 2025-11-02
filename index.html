@@ -13,7 +13,9 @@
   <style>
     :root{
       --bg:#0e0f12;--card:#15171b;--text:#e9edf3;
-      --muted:#9aa3b2;--line:#2a2f39;--accent:#22d3ee;
+      --muted:#9aa3b2;--line:#2a2f39;
+      --accent:#22d3ee;     /* الأزرق عند التشغيل */
+      --prestart:#ff2e2e;   /* الأحمر قبل التشغيل */
     }
     *{box-sizing:border-box}
     body{
@@ -41,8 +43,8 @@
     }
     button{
       background:#0f131a;
-      border:1px solid var(--line);
-      color:var(--text);
+      border:1px solid var(--prestart);
+      color:var(--prestart);
       padding:10px 16px;
       border-radius:10px;
       cursor:pointer;
@@ -50,9 +52,16 @@
       margin:6px;
       transition:.2s;
       width:100%;
+      box-shadow:0 0 12px var(--prestart);
+      text-shadow:0 0 4px var(--prestart);
     }
-    button:hover{border-color:#3a4454}
-    button.active{border-color:var(--accent);color:var(--accent);}
+    button:hover{border-color:#ff5a5a;color:#ff5a5a}
+    button.active{
+      border-color:var(--accent);
+      color:var(--accent);
+      box-shadow:0 0 12px var(--accent);
+      text-shadow:0 0 4px var(--accent);
+    }
     .count-box{
       display:flex;
       justify-content:center;
@@ -81,9 +90,9 @@
   <div class="panel">
     <button id="toggleBtn">تشغيل</button>
     <div class="count-box" aria-live="polite">
-      <div class="count-label">كل</div>
+      <div class="count-label">تحديث كل</div>
       <div id="countdown" class="count-number">5</div>
-      <div class="count-label">ثوان</div>
+      <div class="count-label"></div>
     </div>
     <div class="muted">ملاحظة : لا تغلق المتصفح</div>
   </div>
@@ -101,7 +110,6 @@
     const toggleBtn = document.getElementById("toggleBtn");
     const countdownEl = document.getElementById("countdown");
 
-    // ✅ سيرفرات إثبات المواقع
     const urls = [
       "https://speedtest.saudi.net.sa:8080/speedtest/upload.php",
       "https://jed-speedtest.saudi.net.sa:8080/speedtest/upload.php",
@@ -120,7 +128,6 @@
     let worker;
     let tickTimer;
 
-    // ✅ Web Worker لإثبات المواقع
     const workerScript = `
       const urls = ${JSON.stringify(urls)};
       let interval = ${intervalSec} * 1000;
@@ -143,7 +150,6 @@
       };
     `;
 
-    // ✅ حفظ الحالة بعد التحديث
     function saveState(state){ localStorage.setItem("speedBypassRunning",state?"true":"false"); }
 
     function start(){
