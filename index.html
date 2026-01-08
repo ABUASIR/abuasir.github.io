@@ -1,253 +1,213 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>📅 تحويل التاريخ + حاسبة العمر + إضافة أيام</title>
-<style>
-  body{
-    margin:0;font-family:Tahoma,sans-serif;
-    color:#e0f2f1;text-align:center;
-    background:#000;display:flex;flex-direction:column;min-height:100vh;
-  }
-  header{
-    background:#111;padding:20px;font-weight:bold;color:#26c6da;
-    text-shadow:0 0 10px #26c6da;border-bottom:2px solid #004d40;line-height:1.8;
-  }
-  #todayFull{font-size:22px;margin-bottom:8px}
-  #todayBoth{font-size:18px;color:#80deea}
-  section{
-    margin:20px auto;width:90%;max-width:600px;background:#1b2a24;
-    padding:20px;border-radius:15px;box-shadow:0 0 15px rgba(38,198,218,0.2);
-  }
-  h2{color:#26c6da;margin-bottom:15px;text-shadow:0 0 8px #00acc1}
-  input,button{margin:6px 4px;border-radius:6px;border:none;font-size:15px}
-  input{
-    background:#263238;color:#fff;text-align:center;width:90px;padding:8px;
-    border:1px solid #004d40;
-  }
-  button{
-    background:#2e7d32;color:#fff;font-weight:bold;cursor:pointer;
-    transition:0.3s;width:90%;max-width:250px;margin-top:10px;
-    padding:10px;border-radius:8px;box-shadow:0 0 10px #1b5e20;
-  }
-  button:hover{background:#1b5e20}
-  .result{
-    margin-top:15px;font-size:18px;color:#fff;font-weight:bold;
-    padding:10px;border-radius:8px;background:rgba(0,0,0,0.6);
-    text-shadow:0 0 6px #26c6da;opacity:0;transition:opacity 0.8s;
-    min-height:40px;display:flex;align-items:center;justify-content:center;
-  }
-  .result.show{opacity:1}
-  footer{
-    margin-top:auto;background:#111;padding:12px;font-size:14px;color:#26c6da;
-    text-shadow:0 0 6px #00acc1;border-top:1px solid #004d40;
-    font-weight:bold;letter-spacing:1px;
-  }
-</style>
-</head>
-<body>
-<header>
-  <div id="todayFull">📅 اليوم --</div>
-  <div id="todayBoth">----/--/-- الموافق ----/--/--</div>
-</header>
-
-<section>
-  <h2>من هجري إلى ميلادي</h2>
-  <input type="number" id="hDay" placeholder="اليوم" min="1" max="30">
-  <input type="number" id="hMonth" placeholder="الشهر" min="1" max="12">
-  <input type="number" id="hYear" placeholder="السنة">
-  <br>
-  <button onclick="hijriToGregorian()">تحويل</button>
-  <div id="gregorianResult" class="result"></div>
-</section>
-
-<section>
-  <h2>من ميلادي إلى هجري</h2>
-  <input type="number" id="gDay" placeholder="اليوم" min="1" max="31">
-  <input type="number" id="gMonth" placeholder="الشهر" min="1" max="12">
-  <input type="number" id="gYear" placeholder="السنة">
-  <br>
-  <button onclick="gregorianToHijri()">تحويل</button>
-  <div id="hijriResult" class="result"></div>
-</section>
-
-<section>
-  <h2>حاسبة العمر (هجري)</h2>
-  <input type="number" id="bhDay" placeholder="اليوم" min="1" max="30">
-  <input type="number" id="bhMonth" placeholder="الشهر" min="1" max="12">
-  <input type="number" id="bhYear" placeholder="السنة">
-  <br>
-  <button onclick="calculateAgeHijri()">احسب عمرك</button>
-  <div id="ageResult" class="result"></div>
-</section>
-
-<!-- ✅ الجديد: حاسبة العمر (ميلادي) -->
-<section>
-  <h2>حاسبة العمر (ميلادي)</h2>
-  <input type="number" id="gbDay" placeholder="اليوم" min="1" max="31">
-  <input type="number" id="gbMonth" placeholder="الشهر" min="1" max="12">
-  <input type="number" id="gbYear" placeholder="السنة">
-  <br>
-  <button onclick="calculateAgeGregorian()">احسب عمرك</button>
-  <div id="ageGResult" class="result"></div>
-</section>
-
-<section>
-  <h2>فارق تاريخين (هجري)</h2>
-  <p>📌 التاريخ الأول:</p>
-  <input type="number" id="fhDay1" placeholder="اليوم" min="1" max="30">
-  <input type="number" id="fhMonth1" placeholder="الشهر" min="1" max="12">
-  <input type="number" id="fhYear1" placeholder="السنة">
-  <p>📌 التاريخ الثاني:</p>
-  <input type="number" id="fhDay2" placeholder="اليوم" min="1" max="30">
-  <input type="number" id="fhMonth2" placeholder="الشهر" min="1" max="12">
-  <input type="number" id="fhYear2" placeholder="السنة">
-  <br>
-  <button onclick="differenceHijri()">احسب الفارق</button>
-  <div id="diffResult" class="result"></div>
-</section>
-
-<section>
-  <h2>فارق تاريخين (ميلادي)</h2>
-  <p>📌 التاريخ الأول:</p>
-  <input type="number" id="fgDay1" placeholder="اليوم" min="1" max="31">
-  <input type="number" id="fgMonth1" placeholder="الشهر" min="1" max="12">
-  <input type="number" id="fgYear1" placeholder="السنة">
-  <p>📌 التاريخ الثاني:</p>
-  <input type="number" id="fgDay2" placeholder="اليوم" min="1" max="31">
-  <input type="number" id="fgMonth2" placeholder="الشهر" min="1" max="12">
-  <input type="number" id="fgYear2" placeholder="السنة">
-  <br>
-  <button onclick="differenceGregorian()">احسب الفارق</button>
-  <div id="diffGResult" class="result"></div>
-</section>
-
-<section>
-  <h2>إضافة أيام إلى تاريخ ميلادي</h2>
-  <input type="number" id="addDay" placeholder="اليوم" min="1" max="31">
-  <input type="number" id="addMonth" placeholder="الشهر" min="1" max="12">
-  <input type="number" id="addYear" placeholder="السنة">
-  <input type="number" id="daysToAdd" placeholder="الأيام" min="1">
-  <br>
-  <button onclick="addDaysToGregorian()">إحسب</button>
-  <div id="addDaysResult" class="result"></div>
-</section>
-
-<section>
-  <h2>إضافة أيام إلى تاريخ هجري</h2>
-  <input type="number" id="addHDay" placeholder="اليوم" min="1" max="30">
-  <input type="number" id="addHMonth" placeholder="الشهر" min="1" max="12">
-  <input type="number" id="addHYear" placeholder="السنة">
-  <input type="number" id="hDaysToAdd" placeholder="الأيام" min="1">
-  <br>
-  <button onclick="addDaysToHijri()">إحسب</button>
-  <div id="addHijriResult" class="result"></div>
-</section>
-
-<footer>© جميع الحقوق محفوظة | تصميم العسيري ✨</footer>
-
-<script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/moment-hijri@2.1.2/moment-hijri.js"></script>
-<script>
-const arabicDays={Sunday:"الأحد",Monday:"الاثنين",Tuesday:"الثلاثاء",Wednesday:"الأربعاء",Thursday:"الخميس",Friday:"الجمعة",Saturday:"السبت"};
-function showResult(id,text){let box=document.getElementById(id);box.classList.remove("show");setTimeout(()=>{box.innerText=text;box.classList.add("show");},50);}
-function getArabicDay(dateObj){return arabicDays[dateObj.format("dddd")];}
-function showToday(){const today=moment();document.getElementById("todayFull").innerText="📅 اليوم "+getArabicDay(today);document.getElementById("todayBoth").innerText=today.format("iYYYY/iMM/iDD")+" الموافق "+today.format("YYYY/MM/DD");}
-showToday();
-
-function calculateAgeGregorian(){
-  const d=gbDay.value,m=gbMonth.value,y=gbYear.value;
-  if(!d||!m||!y){alert("أدخل ميلادك بالميلادي");return;}
-  const birth=moment(`${y}/${m}/${d}`,"YYYY/M/D");
-  if(!birth.isValid()){showResult("ageGResult","⚠️ غير صحيح");return;}
-  const now=moment();
-  let years=now.year()-birth.year();
-  let months=now.month()-birth.month();
-  let days=now.date()-birth.date();
-  if(days<0){months--;days+=birth.daysInMonth();}
-  if(months<0){years--;months+=12;}
-  const totalDays=now.diff(birth,"days");
-  let result=`${years} سنة`;
-  if(months>0) result+=` و ${months} شهر`;
-  if(days>0) result+=` و ${days} يوم`;
-  result+=` (الإجمالي: ${totalDays} يوم)`;
-  showResult("ageGResult","عمرك بالميلادي: "+result);
-}
-function hijriToGregorian(){
-  const d=hDay.value,m=hMonth.value,y=hYear.value;
-  if(!d||!m||!y){alert("أدخل التاريخ كامل");return;}
-  const hijriDate=moment(`${y}/${m}/${d}`,"iYYYY/iM/iD");
-  if(!hijriDate.isValid()){showResult("gregorianResult","⚠️ غير صحيح");return;}
-  showResult("gregorianResult","📅 التاريخ : "+hijriDate.format("YYYY/MM/DD")+" يوم ("+getArabicDay(hijriDate)+")");
-}
-function gregorianToHijri(){
-  const d=gDay.value,m=gMonth.value,y=gYear.value;
-  if(!d||!m||!y){alert("أدخل التاريخ كامل");return;}
-  const date=moment(`${y}/${m}/${d}`,"YYYY/M/D");
-  if(!date.isValid()){showResult("hijriResult","⚠️ غير صحيح");return;}
-  showResult("hijriResult","📅 التاريخ : "+date.format("iYYYY/iMM/iDD")+" يوم ("+getArabicDay(date)+")");
-}
-function calculateAgeHijri(){
-  const d=bhDay.value,m=bhMonth.value,y=bhYear.value;
-  if(!d||!m||!y){alert("أدخل ميلادك");return;}
-  const birth=moment(`${y}/${m}/${d}`,"iYYYY/iM/iD");
-  if(!birth.isValid()){showResult("ageResult","⚠️ غير صحيح");return;}
-  const todayHijri=moment(moment().format("iYYYY/iM/iD"),"iYYYY/iM/iD");
-  let years=todayHijri.iYear()-birth.iYear();
-  let months=todayHijri.iMonth()-birth.iMonth();
-  let days=todayHijri.iDate()-birth.iDate();
-  if(days<0){months--;days+=30;}
-  if(months<0){years--;months+=12;}
-  let result=`${years} سنة`;
-  if(months>0) result+=` و ${months} شهر`;
-  if(days>0) result+=` و ${days} يوم`;
-  showResult("ageResult","عمرك بالهجري: "+result);
-}
-function differenceHijri(){
-  const d1=fhDay1.value,m1=fhMonth1.value,y1=fhYear1.value;
-  const d2=fhDay2.value,m2=fhMonth2.value,y2=fhYear2.value;
-  if(!d1||!m1||!y1||!d2||!m2||!y2){alert("أدخل التاريخين");return;}
-  const date1=moment(`${y1}/${m1}/${d1}`,"iYYYY/iM/iD");
-  const date2=moment(`${y2}/${m2}/${d2}`,"iYYYY/iM/iD");
-  if(!date1.isValid()||!date2.isValid()){showResult("diffResult","⚠️ غير صحيح");return;}
-  let a=date1.clone(),b=date2.clone();if(b.isBefore(a))[a,b]=[b,a];
-  let years=b.iYear()-a.iYear();let months=b.iMonth()-a.iMonth();let days=b.iDate()-a.iDate();
-  if(days<0){months--;days+=30;}if(months<0){years--;months+=12;}
-  let result=`${years} سنة`;if(months>0)result+=` و ${months} شهر`;if(days>0)result+=` و ${days} يوم`;
-  showResult("diffResult","الفارق: "+result);
-}
-function differenceGregorian(){
-  const d1=fgDay1.value,m1=fgMonth1.value,y1=fgYear1.value;
-  const d2=fgDay2.value,m2=fgMonth2.value,y2=fgYear2.value;
-  if(!d1||!m1||!y1||!d2||!m2||!y2){alert("أدخل التاريخين");return;}
-  let a=moment(`${y1}/${m1}/${d1}`,"YYYY/M/D");let b=moment(`${y2}/${m2}/${d2}`,"YYYY/M/D");
-  if(!a.isValid()||!b.isValid()){showResult("diffGResult","⚠️ تاريخ غير صحيح");return;}
-  if(b.isBefore(a))[a,b]=[b,a];
-  let years=b.year()-a.year();let months=b.month()-a.month();let days=b.date()-a.date();
-  if(days<0){months--;const borrow=b.clone().subtract(1,"months");days+=borrow.daysInMonth();}
-  if(months<0){years--;months+=12;}
-  const totalDays=b.diff(a,"days");
-  let result=`${years} سنة`;if(months>0)result+=` و ${months} شهر`;if(days>0)result+=` و ${days} يوم`;
-  result+=` (المجموع: ${totalDays} يوم)`;
-  showResult("diffGResult","الفارق: "+result);
-}
-function addDaysToGregorian(){
-  const d=addDay.value,m=addMonth.value,y=addYear.value,days=daysToAdd.value;
-  if(!d||!m||!y||!days){alert("أدخل التاريخ وعدد الأيام");return;}
-  let date=moment(`${y}/${m}/${d}`,"YYYY/M/D");
-  if(!date.isValid()){showResult("addDaysResult","⚠️ تاريخ غير صحيح");return;}
-  let newDate=date.add(parseInt(days),"days");
-  showResult("addDaysResult","📅 التاريخ : "+newDate.format("YYYY/MM/DD")+" يوم ("+getArabicDay(newDate)+")");
-}
-function addDaysToHijri(){
-  const d=addHDay.value,m=addHMonth.value,y=addHYear.value,days=hDaysToAdd.value;
-  if(!d||!m||!y||!days){alert("أدخل التاريخ وعدد الأيام");return;}
-  let hijriDate=moment(`${y}/${m}/${d}`,"iYYYY/iM/iD");
-  if(!hijriDate.isValid()){showResult("addHijriResult","⚠️ تاريخ غير صحيح");return;}
-  let newDate=hijriDate.clone().add(parseInt(days),"days");
-  showResult("addHijriResult","📅 التاريخ : "+newDate.format("iYYYY/iMM/iDD")+" يوم ("+getArabicDay(newDate)+")");
-}
-</script>
-</body>
+<!DOCTYPE html>  
+<html lang="ar" dir="rtl">  
+<head>  
+  <meta charset="utf-8" />  
+  <meta name="viewport" content="width=device-width, initial-scale=1" />  
+  <title>تخطي تحديد السرعة</title>  
+  
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">  
+  
+  <style>  
+    :root{  
+      --bg:#0d0f13;  
+      --card:#15171b;  
+      --text:#e9edf3;  
+      --muted:#9aa3b2;  
+      --line:#2a2f39;  
+      --accent:#22d3ee;  
+      --danger:#ff3b3b;  
+    }  
+  
+    body{  
+      margin:0;  
+      background:var(--bg);  
+      color:var(--text);  
+      font-family:"Tajawal",sans-serif;  
+      text-align:center;  
+      display:flex;  
+      flex-direction:column;  
+      align-items:center;  
+      padding:20px;  
+    }  
+  
+    h1{  
+      font-weight:800;  
+      margin-bottom:10px;  
+      color:var(--accent);  
+      text-shadow:0 0 10px rgba(34,211,238,0.3);
+    }  
+  
+    .panel{  
+      background:var(--card);  
+      border:1px solid var(--line);  
+      padding:22px;  
+      width:min(450px,92vw);  
+      border-radius:18px;  
+      box-shadow:0 0 25px rgba(0,0,0,.4);  
+    }  
+  
+    #toggleBtn{  
+      background:#0f131a;  
+      border:1px solid var(--danger);  
+      color:var(--danger);  
+      padding:14px;  
+      font-size:1.2rem;  
+      border-radius:12px;  
+      cursor:pointer;  
+      width:100%;  
+      transition:.25s;  
+      font-weight:700;
+      text-shadow:0 0 4px var(--danger);
+      box-shadow:0 0 15px rgba(255,0,0,0.35);  
+    }  
+    #toggleBtn.active{  
+      border-color:var(--accent);  
+      color:var(--accent);  
+      box-shadow:0 0 15px var(--accent);  
+      text-shadow:0 0 4px var(--accent);
+    }  
+  
+    .circle{  
+      width:115px;  
+      height:115px;  
+      border-radius:50%;  
+      display:flex;  
+      align-items:center;  
+      justify-content:center;  
+      font-size:2rem;  
+      font-weight:bold;  
+      border:6px solid var(--line);  
+      margin:22px auto;  
+      background:radial-gradient(circle at center,rgba(34,211,238,.15),rgba(0,0,0,0));  
+      box-shadow:0 0 20px rgba(34,211,238,0.15);  
+    }  
+  
+    footer{  
+      margin-top:22px;  
+      font-size:.95rem;  
+      color:var(--muted);
+      opacity:0.8;
+    }  
+  </style>  
+</head>  
+  
+<body>  
+  
+  <h1>تخطي تحديد السرعة</h1>  
+  
+  <div class="panel">  
+  
+    <button id="toggleBtn">تشغيل</button>  
+  
+    <div class="circle" id="circleTimer">5</div>  
+  
+  </div>
+  
+<script>  
+/* السيرفرات */  
+const urls = [  
+  "https://speedtest.saudi.net.sa:8080/speedtest/upload.php",  
+  "https://jed-speedtest.saudi.net.sa:8080/speedtest/upload.php",  
+  "https://riyadh-speedtest.saudi.net.sa:8080/speedtest/upload.php",  
+  "https://dammam-speedtest.saudi.net.sa:8080/speedtest/upload.php",  
+  "https://baha-speedtest.saudi.net.sa:8080/speedtest/upload.php",  
+  "https://abha-speedtest.saudi.net.sa:8080/speedtest/upload.php",  
+  "https://taif-speedtest.saudi.net.sa:8080/speedtest/upload.php",  
+  "https://makkah-speedtest.saudi.net.sa:8080/speedtest/upload.php",  
+  "https://bahrah-speedtest.saudi.net.sa:8080/speedtest/upload.php",  
+  "https://khamismushait-speedtest.saudi.net.sa:8080/speedtest/upload.php"  
+];  
+  
+const intervalSec = 5;  
+  
+let running = false;  
+let worker = null;  
+let timer = null;  
+  
+const toggleBtn = document.getElementById("toggleBtn");  
+const circle = document.getElementById("circleTimer");  
+  
+/* سكربت Web Worker */  
+const workerScript = `  
+  const urls = ${JSON.stringify(urls)};  
+  const interval = ${intervalSec} * 1000;  
+  let timer;  
+  
+  async function ping(url){  
+    const t0 = performance.now();  
+    try{  
+      await fetch(url,{method:"GET",mode:"no-cors",cache:"no-store"});  
+      postMessage({ms:Math.round(performance.now()-t0)});  
+    }catch{  
+      postMessage({ms:Math.round(performance.now()-t0)});  
+    }  
+  }  
+  
+  function checkAll(){  
+    postMessage({alive:true});  
+    for(const u of urls) ping(u);  
+  }  
+  
+  onmessage = e=>{  
+    if(e.data==="start"){  
+      checkAll();  
+      timer = setInterval(checkAll, interval);  
+    }else{  
+      clearInterval(timer);  
+    }  
+  };  
+`;  
+  
+/* تشغيل */  
+function start(){  
+  if(running) return;  
+  running = true;  
+  
+  toggleBtn.textContent = "إيقاف";  
+  toggleBtn.classList.add("active");  
+  
+  const blob = new Blob([workerScript],{type:"application/javascript"});  
+  worker = new Worker(URL.createObjectURL(blob));  
+  worker.postMessage("start");  
+  
+  let lastAlive = Date.now();  
+  worker.onmessage = e => {  
+    if(e.data.alive){  
+      lastAlive = Date.now();  
+    }  
+  };  
+  
+  let t = intervalSec;  
+  circle.textContent = t;  
+  
+  timer = setInterval(()=>{  
+  
+    if(Date.now() - lastAlive > 3000){  
+      console.log("⚠️ Worker stopped — countdown paused");  
+      return;  
+    }  
+  
+    t = t>1 ? t-1 : intervalSec;  
+    circle.textContent = t;  
+  
+  },1000);  
+}  
+  
+/* إيقاف */  
+function stop(){  
+  running = false;  
+  
+  toggleBtn.textContent = "تشغيل";  
+  toggleBtn.classList.remove("active");  
+  
+  if(worker){ worker.postMessage("stop"); worker.terminate(); worker=null; }  
+  if(timer){ clearInterval(timer); timer=null; }  
+}  
+  
+toggleBtn.addEventListener("click",()=> running ? stop() : start());  
+</script>  
+  
+<footer>💠 دعمك ونشرك للموقع يساعدنا على الاستمرار 💠</footer>  
+  
+</body>  
 </html>
