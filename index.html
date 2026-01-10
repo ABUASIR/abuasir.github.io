@@ -1,189 +1,414 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>اليوم والتاريخ (ميلادي / هجري)</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>حاسبة خاصة تصميم العسيري</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --panel:#0f1e1a;
+    --box:#2a343b;
+    --stroke:#0a6a5d;
+    --cyan:#00cfe8;
+    --txt:#e0f2f1;
+    --muted:#9fbdb9;
+  }
 
-  <style>
-    :root{
-      --bg:#0b0f17;
-      --card:#121a26;
-      --text:#eaf0ff;
-      --muted:#a6b3cc;
-      --line:rgba(255,255,255,.08);
-      --accent:#22d3ee;
-      --accent2:#60a5fa;
-      --shadow:0 18px 60px rgba(0,0,0,.45);
-      --radius:18px;
-    }
+  body{
+    margin:0;
+    font-family:Tahoma,sans-serif;
+    background:#000;
+    color:var(--txt);
+    display:flex;
+    flex-direction:column;
+    min-height:100vh;
+    text-align:center;
+  }
 
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      min-height:100vh;
-      font-family:"Tajawal",sans-serif;
-      color:var(--text);
-      background:
-        radial-gradient(1100px 500px at 70% 10%, rgba(34,211,238,.18), transparent 60%),
-        radial-gradient(900px 450px at 20% 20%, rgba(96,165,250,.14), transparent 60%),
-        linear-gradient(180deg,#060912,var(--bg));
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:18px;
-    }
+  header{
+    background:#0a0f0e;
+    border-bottom:2px solid #003b33;
+    padding:18px 14px 16px;
+    color:#26c6da;
+    text-shadow:0 0 10px rgba(38,198,218,.55);
+    line-height:1.9;
+    font-weight:bold;
+  }
 
-    .wrap{width:min(760px,100%)}
+  /* سطر: اليوم الأحد + أيقونة */
+  .topRow{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    font-size:26px;
+    margin-bottom:10px;
+  }
+  .cal{
+    display:inline-grid;
+    place-items:center;
+    width:46px;
+    height:46px;
+    border-radius:10px;
+    background:#e9eef2;
+    color:#111;
+    font-weight:800;
+    text-shadow:none;
+    position:relative;
+    box-shadow:0 0 16px rgba(38,198,218,.18);
+    overflow:hidden;
+  }
+  .cal::before{
+    content:attr(data-mon);
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    height:16px;
+    background:#d61f1f;
+    color:#fff;
+    font-weight:800;
+    font-size:11px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    letter-spacing:.3px;
+  }
+  .cal span{
+    margin-top:10px;
+    font-size:18px;
+  }
 
-    .card{
-      background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      position:relative;
-      overflow:hidden;
-    }
+  /* سطر التاريخين مثل الصورة */
+  #todayBoth{
+    font-size:22px;
+    color:#80deea;
+    letter-spacing:.3px;
+  }
 
-    .inner{padding:22px}
+  /* لضمان ترتيب الأرقام داخل RTL */
+  .dateLTR{
+    direction:ltr;
+    unicode-bidi:isolate;
+    display:inline-block;
+  }
 
-    header{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      padding-bottom:14px;
-      border-bottom:1px solid var(--line);
-      margin-bottom:16px;
-    }
+  .wrap{
+    width:92%;
+    max-width:820px;
+    margin:22px auto;
+    background:var(--panel);
+    border-radius:22px;
+    padding:22px 18px 26px;
+    box-shadow:0 0 26px rgba(0,207,232,.12);
+    border:1px solid rgba(10,106,93,.35);
+  }
 
-    .title{
-      font-size:20px;
-      font-weight:800;
-      display:flex;
-      gap:10px;
-      align-items:center;
-    }
+  h2{
+    margin:0 0 16px;
+    font-size:32px;
+    color:#26c6da;
+    text-shadow:0 0 10px rgba(0,172,193,.6);
+    letter-spacing:.2px;
+  }
 
-    .clock{
-      font-weight:800;
-      font-size:14px;
-      padding:8px 12px;
-      border-radius:999px;
-      border:1px solid var(--line);
-      background:rgba(18,26,38,.6);
-    }
+  /* مدخلات اليوم/الشهر/السنة بجانب بعض مثل الصورة */
+  .inputsRow{
+    display:flex;
+    gap:14px;
+    justify-content:space-between;
+    align-items:center;
+    margin:14px auto 14px;
+    max-width:760px;
+  }
 
-    .grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:12px;
-    }
+  /* ترتيب من اليمين لليسار: اليوم ثم الشهر ثم السنة */
+  .inputsRow input:nth-child(1){ order:1; }
+  .inputsRow input:nth-child(2){ order:2; }
+  .inputsRow input:nth-child(3){ order:3; }
 
-    @media(max-width:640px){
-      .grid{grid-template-columns:1fr}
-    }
+  input{
+    width:100%;
+    padding:18px 14px;
+    border-radius:16px;
+    border:2px solid rgba(10,106,93,.55);
+    background:var(--box);
+    color:#fff;
+    font-size:24px;
+    text-align:center;
+    outline:none;
+    box-shadow:0 0 18px rgba(0,207,232,.08);
+  }
+  input::placeholder{color:rgba(224,242,241,.45);font-size:18px}
 
-    .box{
-      background:rgba(18,26,38,.6);
-      border:1px solid var(--line);
-      border-radius:16px;
-      padding:14px;
-    }
+  /* زر واحد للفترة + قائمة اختيار */
+  .pickerRow{
+    display:flex;
+    justify-content:center;
+    margin:10px auto 0;
+    max-width:760px;
+  }
 
-    .label{
-      font-size:13px;
-      color:var(--muted);
-      margin-bottom:8px;
-    }
+  .pickerBtn{
+    width:92%;
+    max-width:620px;
+    padding:16px 16px;
+    border-radius:18px;
+    border:2px solid rgba(10,106,93,.55);
+    background:#07312b;
+    color:#cfeff2;
+    font-size:22px;
+    font-weight:bold;
+    cursor:pointer;
+    transition:.18s;
+    box-shadow:0 0 18px rgba(0,207,232,.10);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+  }
+  .pickerBtn:hover{filter:brightness(1.08)}
+  .pickerBtn .leftHint{
+    color:#06201d;
+    background:var(--cyan);
+    padding:6px 12px;
+    border-radius:999px;
+    font-size:14px;
+    font-weight:bold;
+    flex:0 0 auto;
+  }
 
-    .value{
-      font-size:18px;
-      font-weight:800;
-      line-height:1.5;
-    }
+  .dropdown{
+    display:none;
+    width:92%;
+    max-width:620px;
+    margin:10px auto 0;
+    border-radius:18px;
+    border:1px solid rgba(0,207,232,.25);
+    background:rgba(0,0,0,.38);
+    overflow:hidden;
+    box-shadow:0 0 18px rgba(0,207,232,.10);
+    text-align:right;
+  }
+  .dropdown.show{display:block;}
 
-    .pill{
-      margin-top:14px;
-      padding:12px;
-      border-radius:999px;
-      border:1px solid var(--line);
-      background:rgba(18,26,38,.5);
-      font-weight:800;
-      text-align:center;
-    }
+  .opt{
+    padding:14px 14px;
+    cursor:pointer;
+    font-weight:bold;
+    font-size:18px;
+    color:#e0f2f1;
+    border-bottom:1px solid rgba(0,207,232,.12);
+    transition:.15s;
+  }
+  .opt:hover{background:rgba(0,207,232,.10)}
+  .opt:last-child{border-bottom:none;}
 
-    footer{
-      margin-top:14px;
-      padding-top:12px;
-      border-top:1px solid var(--line);
-      font-size:12px;
-      color:var(--muted);
-      text-align:left;
-    }
-  </style>
+  .main{
+    margin-top:16px;
+    width:92%;
+    max-width:620px;
+    padding:18px 14px;
+    border-radius:18px;
+    border:none;
+    background:#0f7a2a;
+    color:#fff;
+    font-weight:bold;
+    font-size:22px;
+    cursor:pointer;
+    box-shadow:0 0 18px rgba(15,122,42,.45);
+    transition:.2s;
+  }
+  .main:hover{filter:brightness(1.07)}
+
+  /* نتيجة */
+  .result{
+    margin:18px auto 0;
+    max-width:760px;
+    border-radius:18px;
+    border:1px solid rgba(0,207,232,.25);
+    background:rgba(0,0,0,.40);
+    box-shadow:0 0 18px rgba(0,207,232,.10);
+    overflow:hidden;
+    opacity:0;
+    transition:opacity .35s;
+    text-align:center;
+  }
+  .result.show{opacity:1}
+
+  .rhead{
+    padding:12px 14px;
+    color:#b2ebf2;
+    font-weight:bold;
+    border-bottom:1px solid rgba(0,207,232,.18);
+    background:rgba(0,207,232,.08);
+  }
+
+  .rangeLine{
+    padding:18px 14px;
+    font-weight:bold;
+    font-size:20px;
+    text-shadow:0 0 6px rgba(38,198,218,.25);
+  }
+
+  footer{
+    margin-top:auto;
+    background:#0a0f0e;
+    padding:12px;
+    color:#26c6da;
+    border-top:1px solid #003b33;
+    text-shadow:0 0 8px rgba(0,172,193,.4);
+    font-weight:bold;
+    letter-spacing:1px;
+    font-size:14px;
+  }
+
+  @media (max-width:620px){
+    .topRow{font-size:22px}
+    #todayBoth{font-size:18px}
+    h2{font-size:26px}
+    input{font-size:20px;padding:16px 12px}
+    .inputsRow{gap:10px}
+    .pickerBtn{font-size:18px}
+    .rangeLine{font-size:18px}
+  }
+</style>
 </head>
 
 <body>
+<header>
+  <div class="topRow">
+    <span id="todayLabel">اليوم --</span>
+    <span class="cal" id="calBox" data-mon="Jul"><span id="calDay">--</span></span>
+  </div>
+
+  <!-- مثل الصورة: 1447/07/22 الموافق 2026/01/11 -->
+  <div id="todayBoth">----/--/-- الموافق ----/--/--</div>
+</header>
+
 <div class="wrap">
-  <div class="card">
-    <div class="inner">
-      <header>
-        <div class="title">📅 اليوم والتاريخ</div>
-        <div class="clock" id="clock">--:--:--</div>
-      </header>
+  <h2>حاسبة خاصة تصميم العسيري</h2>
 
-      <div class="grid">
-        <div class="box">
-          <div class="label">اليوم</div>
-          <div class="value" id="weekday">—</div>
-        </div>
+  <!-- اليوم ثم الشهر ثم السنة -->
+  <div class="inputsRow">
+    <input type="number" id="day" placeholder="اليوم" min="1" max="31" value="1">
+    <input type="number" id="month" placeholder="الشهر" min="1" max="12" value="1">
+    <input type="number" id="year" placeholder="السنة" value="2025">
+  </div>
 
-        <div class="box">
-          <div class="label">التاريخ الميلادي</div>
-          <div class="value" id="gregorian">—</div>
-        </div>
+  <!-- زر واحد للفترة -->
+  <div class="pickerRow">
+    <button class="pickerBtn" id="periodBtn" type="button">
+      <span id="periodText">فترة</span>
+      <span class="leftHint">اختيار</span>
+    </button>
+  </div>
 
-        <div class="box">
-          <div class="label">التاريخ الهجري</div>
-          <div class="value" id="hijri">—</div>
-        </div>
-      </div>
+  <!-- قائمة اختيار -->
+  <div class="dropdown" id="periodMenu">
+    <div class="opt" data-days="89">فترة</div>
+    <div class="opt" data-days="179">فترتين</div>
+    <div class="opt" data-days="269">ثلاث فترات</div>
+  </div>
 
-      <div class="pill" id="combined">📅 —</div>
+  <button class="main" id="calcBtn">احسب</button>
 
-      <footer id="iso">—</footer>
-    </div>
+  <div class="result" id="resultBox" aria-live="polite">
+    <div class="rhead">النتيجة</div>
+    <div class="rangeLine" id="rangeLine">—</div>
   </div>
 </div>
 
+<footer>© جميع الحقوق محفوظة | تصميم العسيري ✨</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/moment-hijri@2.1.2/moment-hijri.js"></script>
+
 <script>
-  const DAYS_AR = ["الأحد","الإثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
+  const arabicDays = ["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
+  const $ = (id) => document.getElementById(id);
 
-  function update(){
-    const now = new Date();
+  function pad2(n){ return String(n).padStart(2,"0"); }
+  function dayName(m){ return arabicDays[m.day()]; }
 
-    document.getElementById("weekday").textContent = DAYS_AR[now.getDay()];
-    document.getElementById("gregorian").textContent =
-      new Intl.DateTimeFormat("ar-SA",{year:"numeric",month:"long",day:"2-digit"}).format(now);
-
-    document.getElementById("hijri").textContent =
-      new Intl.DateTimeFormat("ar-SA-u-ca-islamic-umalqura",{year:"numeric",month:"long",day:"2-digit"}).format(now);
-
-    document.getElementById("clock").textContent =
-      new Intl.DateTimeFormat("ar-SA",{hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false}).format(now);
-
-    document.getElementById("combined").textContent =
-      `📅 ${DAYS_AR[now.getDay()]} | ${document.getElementById("gregorian").textContent} | ${document.getElementById("hijri").textContent}`;
-
-    document.getElementById("iso").textContent = now.toISOString();
+  // صيغة مثل الصورة: YYYY/MM/DD
+  function fmtYMD(m){
+    const s = `${m.year()}/${pad2(m.month()+1)}/${pad2(m.date())}`;
+    return `<span class="dateLTR">${s}</span>`;
+  }
+  function fmtHijriYMD(m){
+    const s = m.format("iYYYY/iMM/iDD");
+    return `<span class="dateLTR">${s}</span>`;
   }
 
-  update();
-  setInterval(update,1000);
+  // تحديث الهيدر مثل الصورة:
+  // "اليوم الأحد" + "1447/07/22 الموافق 2026/01/11"
+  function showHeader(){
+    const now = moment();
+
+    $("todayLabel").innerText = `اليوم ${dayName(now)}`;
+
+    // أيقونة التقويم (شهر إنجليزي + رقم اليوم)
+    const mon = now.format("MMM");     // Jan, Feb...
+    $("calBox").setAttribute("data-mon", mon);
+    $("calDay").innerText = now.date();
+
+    $("todayBoth").innerHTML = `${fmtHijriYMD(now)} الموافق ${fmtYMD(now)}`;
+  }
+  showHeader();
+
+  // الفترة (زر واحد + قائمة)
+  let selectedDays = 89;
+  const periodBtn  = $("periodBtn");
+  const periodMenu = $("periodMenu");
+  const periodText = $("periodText");
+
+  periodBtn.addEventListener("click", () => {
+    periodMenu.classList.toggle("show");
+  });
+
+  document.addEventListener("click", (e) => {
+    const inside = periodMenu.contains(e.target) || periodBtn.contains(e.target);
+    if (!inside) periodMenu.classList.remove("show");
+  });
+
+  periodMenu.querySelectorAll(".opt").forEach(opt => {
+    opt.addEventListener("click", () => {
+      selectedDays = Number(opt.dataset.days);
+      periodText.textContent = opt.textContent.trim();
+      periodMenu.classList.remove("show");
+    });
+  });
+
+  function showResult(html){
+    $("rangeLine").innerHTML = html;
+    $("resultBox").classList.add("show");
+  }
+
+  function calc(){
+    const d = Number($("day").value);
+    const m = Number($("month").value);
+    const y = Number($("year").value);
+
+    if (!d || !m || !y){
+      showResult("⚠️ أدخل اليوم ثم الشهر ثم السنة.");
+      return;
+    }
+
+    const start = moment(`${y}/${m}/${d}`, "YYYY/M/D", true);
+    if (!start.isValid()){
+      showResult("⚠️ تاريخ غير صحيح.");
+      return;
+    }
+
+    const end = start.clone().add(selectedDays, "days");
+
+    // النتيجة بصيغة YYYY/MM/DD ثابتة مثل الهيدر (بدون انقلاب)
+    showResult(`الفترة من ${fmtYMD(start)} إلى ${fmtYMD(end)}`);
+  }
+
+  $("calcBtn").addEventListener("click", calc);
 </script>
 </body>
 </html>
