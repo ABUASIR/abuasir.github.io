@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>حاسبة وتحويل التاريخ تصميم العسيري</title>
+<title>تحويل التاريخ تصميم العسيري</title>
 
 <style>
   :root{
@@ -338,11 +338,13 @@
   const fmtYMD = (m) => `<span class="dateLTR">${m.year()}/${pad2(m.month()+1)}/${pad2(m.date())}</span>`;
   const fmtHijriYMD = (m) => `<span class="dateLTR">${m.format("iYYYY/iMM/iDD")}</span>`;
 
+  // ✅ اسم اليوم للعربي لأي تاريخ moment
+  const dayAr = (m) => arabicDays[m.day()];
+
   // ✅ عرض التاريخ أعلى الصفحة
   function updateHeaderDates(){
     const now = moment();
-    const dayName = arabicDays[now.day()];
-    $("todayLabel").innerText = `اليوم ${dayName}`;
+    $("todayLabel").innerText = `اليوم ${dayAr(now)}`;
     $("calBox").setAttribute("data-mon", now.format("MMM"));
     $("calDay").innerText = now.date();
     $("todayBoth").innerHTML = `${fmtHijriYMD(now)} الموافق ${fmtYMD(now)}`;
@@ -420,7 +422,8 @@
       return;
     }
 
-    box.innerHTML = `التاريخ الميلادي: ${fmtYMD(hijri)}`;
+    // ✅ إضافة اليوم
+    box.innerHTML = `التاريخ الميلادي: ${fmtYMD(hijri)} <span style="color:#7fe7f0">(${dayAr(hijri)})</span>`;
     box.classList.add("show");
   });
 
@@ -441,11 +444,11 @@
     if(!g.isValid()){
       box.innerHTML = "⚠️ تاريخ ميلادي غير صحيح.";
       box.classList.add("show");
-      box.classList.add("show");
       return;
     }
 
-    box.innerHTML = `التاريخ الهجري: ${fmtHijriYMD(g)}`;
+    // ✅ إضافة اليوم
+    box.innerHTML = `التاريخ الهجري: ${fmtHijriYMD(g)} <span style="color:#7fe7f0">(${dayAr(g)})</span>`;
     box.classList.add("show");
   });
 </script>
