@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>تحويل التاريخ يرمجة العسيري</title>
+<title>تحويل التاريخ برمجة العسيري</title>
 
 <style>
   :root{
@@ -30,6 +30,58 @@
     min-height:100vh;
     display:flex;
     flex-direction:column;
+  }
+
+  /* ====== شاشة تسجيل الدخول ====== */
+  #login-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(5, 7, 7, 0.95);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+  }
+  .login-card {
+    width: 100%;
+    max-width: 380px;
+    margin: 20px;
+    border-radius: 22px;
+    border: 1px solid var(--stroke);
+    background: linear-gradient(180deg, rgba(11,26,22,.95), rgba(7,19,16,.95));
+    box-shadow: 0 0 35px rgba(0,207,232,.2);
+    padding: 24px 20px;
+    text-align: center;
+  }
+  .login-card h2 {
+    margin-bottom: 16px;
+    color: var(--cyan);
+    font-size: 22px;
+  }
+  .login-card input {
+    width: 100%;
+    background: rgba(18,36,32,.92);
+    border: 1px solid var(--stroke);
+    border-radius: 14px;
+    padding: 12px 14px;
+    color: #fff;
+    font-size: 18px;
+    text-align: center;
+    outline: none;
+    margin-bottom: 14px;
+  }
+  .login-error {
+    color: #ff5252;
+    font-size: 14px;
+    margin-top: 10px;
+  }
+
+  /* إخفاء محتوى الصفحة الأصلي حتى يتم إدخال كلمة المرور */
+  #protected-page {
+    display: none;
+    flex-direction: column;
+    min-height: 100vh;
   }
 
   /* ====== Header (التاريخ أعلى الصفحة) ====== */
@@ -102,7 +154,6 @@
     flex:1;
   }
 
-  /* ✅ كرت مضبوط: يمنع خروج العناصر */
   .card{
     width:100%;
     position:relative;
@@ -124,7 +175,6 @@
     letter-spacing:.2px;
   }
 
-  /* ✅ شبكة الإدخالات: ثلاث أعمدة داخل الكرت */
   .grid3{
     width:100%;
     max-width:720px;
@@ -186,7 +236,6 @@
   }
   .btnPeriod:hover{background:rgba(0, 207, 232, .10)}
 
-  /* ✅ قائمة الفترة */
   .menu{
     width:100%;
     max-width:420px;
@@ -212,7 +261,6 @@
   .menu button:last-child{border-bottom:none}
   .menu button:hover{background:rgba(0,207,232,.10)}
 
-  /* ✅ نتيجة */
   .result{
     width:100%;
     max-width:720px;
@@ -236,7 +284,6 @@
     #todayBoth{font-size:18px}
   }
 
-  /* ====== Footer (الحقوق) ====== */
   footer{
     padding:14px 10px 18px;
     text-align:center;
@@ -250,207 +297,249 @@
 
 <body>
 
-<!-- ✅ التاريخ أعلى الصفحة -->
-<header>
-  <div class="topRow">
-    <span id="todayLabel">اليوم --</span>
-    <span class="cal" id="calBox" data-mon="Jan"><span id="calDay">--</span></span>
+<!-- شاشة طلب كلمة السر -->
+<div id="login-overlay">
+  <div class="login-card">
+    <h2>يرجى إدخال كلمة المرور</h2>
+    <input type="password" id="unlock-input" placeholder="كلمة السر...">
+    <button class="btn btnGreen" type="button" onclick="unlockPage()">دخول</button>
+    <div class="login-error" id="login-error"></div>
   </div>
-  <div id="todayBoth">----/--/-- الموافق ----/--/--</div>
-</header>
-
-<div class="wrapper">
-
-  <!-- 1) الفترات -->
-  <section class="card">
-    <h2>ادخل تاريخ الفترة بالميلادي</h2>
-
-    <div class="grid3">
-      <input id="pDay"   type="number" placeholder="اليوم"  min="1" max="31">
-      <input id="pMonth" type="number" placeholder="الشهر"  min="1" max="12">
-      <input id="pYear"  type="number" placeholder="السنة"  min="1">
-    </div>
-
-    <div class="btnRow">
-      <button class="btn btnPeriod" id="periodBtn" type="button">فترة</button>
-
-      <div class="menu" id="periodMenu">
-        <button type="button" data-days="89">فترة</button>
-        <button type="button" data-days="179">فترتين</button>
-        <button type="button" data-days="269">ثلاث فترات</button>
-      </div>
-
-      <button class="btn btnGreen" id="calcPeriod" type="button">احسب</button>
-    </div>
-
-    <div class="result" id="periodRes">—</div>
-  </section>
-
-  <!-- 2) هجري -> ميلادي -->
-  <section class="card">
-    <h2>من هجري إلى ميلادي</h2>
-
-    <div class="grid3">
-      <input id="hDay"   type="number" placeholder="اليوم"  min="1" max="30">
-      <input id="hMonth" type="number" placeholder="الشهر"  min="1" max="12">
-      <input id="hYear"  type="number" placeholder="السنة"  min="1">
-    </div>
-
-    <div class="btnRow">
-      <button class="btn btnGreen" id="btnH2G" type="button">تحويل</button>
-    </div>
-
-    <div class="result" id="h2gRes">—</div>
-  </section>
-
-  <!-- 3) ميلادي -> هجري -->
-  <section class="card">
-    <h2>من ميلادي إلى هجري</h2>
-
-    <div class="grid3">
-      <input id="gDay"   type="number" placeholder="اليوم"  min="1" max="31">
-      <input id="gMonth" type="number" placeholder="الشهر"  min="1" max="12">
-      <input id="gYear"  type="number" placeholder="السنة"  min="1">
-    </div>
-
-    <div class="btnRow">
-      <button class="btn btnGreen" id="btnG2H" type="button">تحويل</button>
-    </div>
-
-    <div class="result" id="g2hRes">—</div>
-  </section>
-
 </div>
 
-<!-- ✅ الحقوق أسفل الصفحة -->
-<footer>
-  © <span id="year"></span> جميع الحقوق محفوظة — برمجة العسيري
-</footer>
+<!-- المحتوى الأصلي للصفحة محمي ولا يظهر إلا بعد فتحه -->
+<div id="protected-page">
+
+  <!-- ✅ التاريخ أعلى الصفحة -->
+  <header>
+    <div class="topRow">
+      <span id="todayLabel">اليوم --</span>
+      <span class="cal" id="calBox" data-mon="Jan"><span id="calDay">--</span></span>
+    </div>
+    <div id="todayBoth">----/--/-- الموافق ----/--/--</div>
+  </header>
+
+  <div class="wrapper">
+
+    <!-- 1) الفترات -->
+    <section class="card">
+      <h2>ادخل تاريخ الفترة بالميلادي</h2>
+
+      <div class="grid3">
+        <input id="pDay"   type="number" placeholder="اليوم"  min="1" max="31">
+        <input id="pMonth" type="number" placeholder="الشهر"  min="1" max="12">
+        <input id="pYear"  type="number" placeholder="السنة"  min="1">
+      </div>
+
+      <div class="btnRow">
+        <button class="btn btnPeriod" id="periodBtn" type="button">فترة</button>
+
+        <div class="menu" id="periodMenu">
+          <button type="button" data-days="89">فترة</button>
+          <button type="button" data-days="179">فترتين</button>
+          <button type="button" data-days="269">ثلاث فترات</button>
+        </div>
+
+        <button class="btn btnGreen" id="calcPeriod" type="button">احسب</button>
+      </div>
+
+      <div class="result" id="periodRes">—</div>
+    </section>
+
+    <!-- 2) هجري -> ميلادي -->
+    <section class="card">
+      <h2>من هجري إلى ميلادي</h2>
+
+      <div class="grid3">
+        <input id="hDay"   type="number" placeholder="اليوم"  min="1" max="30">
+        <input id="hMonth" type="number" placeholder="الشهر"  min="1" max="12">
+        <input id="hYear"  type="number" placeholder="السنة"  min="1">
+      </div>
+
+      <div class="btnRow">
+        <button class="btn btnGreen" id="btnH2G" type="button">تحويل</button>
+      </div>
+
+      <div class="result" id="h2gRes">—</div>
+    </section>
+
+    <!-- 3) ميلادي -> هجري -->
+    <section class="card">
+      <h2>من ميلادي إلى هجري</h2>
+
+      <div class="grid3">
+        <input id="gDay"   type="number" placeholder="اليوم"  min="1" max="31">
+        <input id="gMonth" type="number" placeholder="الشهر"  min="1" max="12">
+        <input id="gYear"  type="number" placeholder="السنة"  min="1">
+      </div>
+
+      <div class="btnRow">
+        <button class="btn btnGreen" id="btnG2H" type="button">تحويل</button>
+      </div>
+
+      <div class="result" id="g2hRes">—</div>
+    </section>
+
+  </div>
+
+  <!-- ✅ الحقوق أسفل الصفحة -->
+  <footer>
+    © <span id="year"></span> جميع الحقوق محفوظة — برمجة العسيري
+  </footer>
+
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/moment-hijri@2.1.2/moment-hijri.js"></script>
 <script>
-  const $ = (id) => document.getElementById(id);
+  // التشفير الخاص بكلمة المرور الجديدة التي أرسلتها
+  const correctHash = "ae8c62b2ac1407e3870e6cd16498379c9354db22efae3f0c3a8d11c750b32bf3";
 
-  const arabicDays = ["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
-  const pad2 = (n) => String(n).padStart(2, "0");
-
-  const fmtYMD = (m) => `<span class="dateLTR">${m.year()}/${pad2(m.month()+1)}/${pad2(m.date())}</span>`;
-  const fmtHijriYMD = (m) => `<span class="dateLTR">${m.format("iYYYY/iMM/iDD")}</span>`;
-
-  // ✅ اسم اليوم للعربي لأي تاريخ moment
-  const dayAr = (m) => arabicDays[m.day()];
-
-  // ✅ عرض التاريخ أعلى الصفحة
-  function updateHeaderDates(){
-    const now = moment();
-    $("todayLabel").innerText = `اليوم ${dayAr(now)}`;
-    $("calBox").setAttribute("data-mon", now.format("MMM"));
-    $("calDay").innerText = now.date();
-    $("todayBoth").innerHTML = `${fmtHijriYMD(now)} الموافق ${fmtYMD(now)}`;
+  async function sha256(message) {
+      const msgBuffer = new TextEncoder().encode(message);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+      return hashHex;
   }
-  updateHeaderDates();
 
-  // سنة الحقوق
-  $("year").innerText = new Date().getFullYear();
+  async function unlockPage() {
+      const inputVal = document.getElementById('unlock-input').value;
+      const errorMsg = document.getElementById('login-error');
+      
+      const hashedInput = await sha256(inputVal);
 
-  // ====== الفترات ======
-  let periodDays = 89;
+      if (hashedInput === correctHash) {
+          document.getElementById('login-overlay').style.display = 'none';
+          document.getElementById('protected-page').style.display = 'flex';
+          initApp(); // تشغيل وظائف الصفحة بعد فك القفل
+      } else {
+          errorMsg.textContent = 'كلمة المرور غير صحيحة، حاول مرة أخرى.';
+      }
+  }
 
-  const periodBtn = $("periodBtn");
-  const periodMenu = $("periodMenu");
-
-  periodBtn.addEventListener("click", () => {
-    periodMenu.classList.toggle("show");
+  // السماح بالضغط على مفتاح Enter لإتمام الدخول بسرعة
+  document.getElementById('unlock-input').addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') {
+          unlockPage();
+      }
   });
 
-  periodMenu.querySelectorAll("button").forEach(b => {
-    b.addEventListener("click", () => {
-      periodDays = Number(b.dataset.days);
-      periodBtn.textContent = b.textContent.trim();
-      periodMenu.classList.remove("show");
+  // دوال وتطبيقات الصفحة الأصلية تعمل فقط بعد إدخال كلمة المرور بنجاح
+  function initApp() {
+    const $ = (id) => document.getElementById(id);
+
+    const arabicDays = ["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
+    const pad2 = (n) => String(n).padStart(2, "0");
+
+    const fmtYMD = (m) => `<span class="dateLTR">${m.year()}/${pad2(m.month()+1)}/${pad2(m.date())}</span>`;
+    const fmtHijriYMD = (m) => `<span class="dateLTR">${m.format("iYYYY/iMM/iDD")}</span>`;
+
+    const dayAr = (m) => arabicDays[m.day()];
+
+    function updateHeaderDates(){
+      const now = moment();
+      $("todayLabel").innerText = `اليوم ${dayAr(now)}`;
+      $("calBox").setAttribute("data-mon", now.format("MMM"));
+      $("calDay").innerText = now.date();
+      $("todayBoth").innerHTML = `${fmtHijriYMD(now)} الموافق ${fmtYMD(now)}`;
+    }
+    updateHeaderDates();
+
+    $("year").innerText = new Date().getFullYear();
+
+    let periodDays = 89;
+
+    const periodBtn = $("periodBtn");
+    const periodMenu = $("periodMenu");
+
+    periodBtn.addEventListener("click", () => {
+      periodMenu.classList.toggle("show");
     });
-  });
 
-  // إغلاق القائمة بالنقر خارجها
-  document.addEventListener("click", (e) => {
-    const inside = periodMenu.contains(e.target) || periodBtn.contains(e.target);
-    if (!inside) periodMenu.classList.remove("show");
-  });
+    periodMenu.querySelectorAll("button").forEach(b => {
+      b.addEventListener("click", () => {
+        periodDays = Number(b.dataset.days);
+        periodBtn.textContent = b.textContent.trim();
+        periodMenu.classList.remove("show");
+      });
+    });
 
-  $("calcPeriod").addEventListener("click", () => {
-    const d = Number($("pDay").value);
-    const m = Number($("pMonth").value);
-    const y = Number($("pYear").value);
+    document.addEventListener("click", (e) => {
+      const inside = periodMenu.contains(e.target) || periodBtn.contains(e.target);
+      if (!inside) periodMenu.classList.remove("show");
+    });
 
-    const box = $("periodRes");
-    if(!d || !m || !y){
-      box.innerHTML = "⚠️ أدخل اليوم ثم الشهر ثم السنة.";
+    $("calcPeriod").addEventListener("click", () => {
+      const d = Number($("pDay").value);
+      const m = Number($("pMonth").value);
+      const y = Number($("pYear").value);
+
+      const box = $("periodRes");
+      if(!d || !m || !y){
+        box.innerHTML = "⚠️ أدخل اليوم ثم الشهر ثم السنة.";
+        box.classList.add("show");
+        return;
+      }
+
+      const start = moment(`${y}/${m}/${d}`, "YYYY/M/D", true);
+      if(!start.isValid()){
+        box.innerHTML = "⚠️ تاريخ غير صحيح.";
+        box.classList.add("show");
+        return;
+      }
+
+      const end = start.clone().add(periodDays, "days");
+      box.innerHTML = `الفترة من ${fmtYMD(start)} إلى ${fmtYMD(end)}`;
       box.classList.add("show");
-      return;
-    }
+    });
 
-    const start = moment(`${y}/${m}/${d}`, "YYYY/M/D", true);
-    if(!start.isValid()){
-      box.innerHTML = "⚠️ تاريخ غير صحيح.";
+    $("btnH2G").addEventListener("click", () => {
+      const d = Number($("hDay").value);
+      const m = Number($("hMonth").value);
+      const y = Number($("hYear").value);
+
+      const box = $("h2gRes");
+      if(!d || !m || !y){
+        box.innerHTML = "⚠️ أدخل اليوم ثم الشهر ثم السنة.";
+        box.classList.add("show");
+        return;
+      }
+
+      const hijri = moment(`${y}/${m}/${d}`, "iYYYY/iM/iD", true);
+      if(!hijri.isValid()){
+        box.innerHTML = "⚠️ تاريخ هجري غير صحيح.";
+        box.classList.add("show");
+        return;
+      }
+
+      box.innerHTML = `التاريخ الميلادي: ${fmtYMD(hijri)} <span style="color:#7fe7f0">(${dayAr(hijri)})</span>`;
       box.classList.add("show");
-      return;
-    }
+    });
 
-    const end = start.clone().add(periodDays, "days");
-    box.innerHTML = `الفترة من ${fmtYMD(start)} إلى ${fmtYMD(end)}`;
-    box.classList.add("show");
-  });
+    $("btnG2H").addEventListener("click", () => {
+      const d = Number($("gDay").value);
+      const m = Number($("gMonth").value);
+      const y = Number($("gYear").value);
 
-  // ====== هجري -> ميلادي ======
-  $("btnH2G").addEventListener("click", () => {
-    const d = Number($("hDay").value);
-    const m = Number($("hMonth").value);
-    const y = Number($("hYear").value);
+      const box = $("g2hRes");
+      if(!d || !m || !y){
+        box.innerHTML = "⚠️ أدخل اليوم ثم الشهر ثم السنة.";
+        box.classList.add("show");
+        return;
+      }
 
-    const box = $("h2gRes");
-    if(!d || !m || !y){
-      box.innerHTML = "⚠️ أدخل اليوم ثم الشهر ثم السنة.";
+      const g = moment(`${y}/${m}/${d}`, "YYYY/M/D", true);
+      if(!g.isValid()){
+        box.innerHTML = "⚠️ تاريخ ميلادي غير صحيح.";
+        box.classList.add("show");
+        return;
+      }
+
+      box.innerHTML = `التاريخ الهجري: ${fmtHijriYMD(g)} <span style="color:#7fe7f0">(${dayAr(g)})</span>`;
       box.classList.add("show");
-      return;
-    }
-
-    const hijri = moment(`${y}/${m}/${d}`, "iYYYY/iM/iD", true);
-    if(!hijri.isValid()){
-      box.innerHTML = "⚠️ تاريخ هجري غير صحيح.";
-      box.classList.add("show");
-      return;
-    }
-
-    // ✅ إضافة اليوم
-    box.innerHTML = `التاريخ الميلادي: ${fmtYMD(hijri)} <span style="color:#7fe7f0">(${dayAr(hijri)})</span>`;
-    box.classList.add("show");
-  });
-
-  // ====== ميلادي -> هجري ======
-  $("btnG2H").addEventListener("click", () => {
-    const d = Number($("gDay").value);
-    const m = Number($("gMonth").value);
-    const y = Number($("gYear").value);
-
-    const box = $("g2hRes");
-    if(!d || !m || !y){
-      box.innerHTML = "⚠️ أدخل اليوم ثم الشهر ثم السنة.";
-      box.classList.add("show");
-      return;
-    }
-
-    const g = moment(`${y}/${m}/${d}`, "YYYY/M/D", true);
-    if(!g.isValid()){
-      box.innerHTML = "⚠️ تاريخ ميلادي غير صحيح.";
-      box.classList.add("show");
-      return;
-    }
-
-    // ✅ إضافة اليوم
-    box.innerHTML = `التاريخ الهجري: ${fmtHijriYMD(g)} <span style="color:#7fe7f0">(${dayAr(g)})</span>`;
-    box.classList.add("show");
-  });
+    });
+  }
 </script>
 </body>
 </html>
